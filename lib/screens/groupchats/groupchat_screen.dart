@@ -44,17 +44,24 @@ class ListGroupChat extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserModel user = Provider.of<UserProvider>(context).currentUserModel;
     return StreamBuilder<List<GroupChatModel>>(
-        stream: GroupChatProvider().listGroupChat(
-          user.uid ?? "",
-        ),
-        builder: (context, snapshot) {
-          print(snapshot);
+      stream: GroupChatProvider().listGroupChat(
+        user.uid ?? "",
+      ),
+      builder: (context, snapshot) {
+        print(snapshot);
+        if (snapshot.hasData) {
           return ListView.builder(
             itemCount: snapshot.data?.length,
             itemBuilder: (context, index) =>
                 ItemListGroupChat(groupChatModel: snapshot.data?[index]),
           );
-        });
+        }
+
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
   }
 }
 

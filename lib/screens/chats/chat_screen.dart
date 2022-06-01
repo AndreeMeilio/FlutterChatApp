@@ -18,24 +18,35 @@ class ChatScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).primaryColor,
       appBar: AppBarComponent(auth: _auth, isChatScreen: true),
       body: RefreshIndicator(
+        backgroundColor: ColorsSetting.shadowColor,
+        color: ColorsSetting.secondaryColor,
         onRefresh: Provider.of<UserProvider>(context).listUserStories,
         child: Column(
           children: <Widget>[
             Expanded(
-              flex: 2,
+              flex: 3,
               child: Container(
-                margin: const EdgeInsets.only(bottom: 15),
+                padding: const EdgeInsets.only(top: 20),
                 decoration: BoxDecoration(
-                  color: ColorsSetting.secondaryColor,
-                  boxShadow: [
-                    BoxShadow(
+                    color: ColorsSetting.secondaryColor,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.elliptical(250, 40),
+                      bottomRight: Radius.elliptical(250, 40),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
                         color: ColorsSetting.shadowColor,
                         blurRadius: 15,
-                        spreadRadius: 3)
-                  ],
-                ),
+                        spreadRadius: 5,
+                        offset: const Offset(0, 1),
+                      ),
+                    ]),
                 child: const StatusUser(),
               ),
+            ),
+            const Expanded(
+              flex: 2,
+              child: DividerStatusAndUser(),
             ),
             Expanded(
               flex: 13,
@@ -58,11 +69,28 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
-class StatusUser extends StatelessWidget {
+//status user avatar
+class StatusUser extends StatefulWidget {
   const StatusUser({Key? key}) : super(key: key);
 
   @override
+  State<StatusUser> createState() => _StatusUserState();
+}
+
+class _StatusUserState extends State<StatusUser> with WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.detached) {
+      Provider.of<UserProvider>(context).resetDataStoriesUser();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // context.read<UserProvider>().listUserStories().then((value) => null);
     return Consumer<UserProvider>(
       builder: (context, value, child) => ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -71,17 +99,23 @@ class StatusUser extends StatelessWidget {
           print(
               "di list: ${value.listStoriesUser}/ ${value.listStoriesUser.length}");
           return Align(
-            alignment: Alignment.center,
+            alignment: Alignment.topCenter,
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: ColorsSetting.shadowColor,
-                  width: 3,
-                ),
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(50),
-                ),
-              ),
+                  border: Border.all(
+                    color: ColorsSetting.shadowColor,
+                    width: 3,
+                  ),
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(50),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ColorsSetting.shadowColor,
+                      blurRadius: 3,
+                      spreadRadius: 1,
+                    ),
+                  ]),
               margin: EdgeInsets.only(right: 15, left: (index == 0) ? 15 : 0),
               child: CircleAvatar(
                 radius: 25,
@@ -98,6 +132,7 @@ class StatusUser extends StatelessWidget {
   }
 }
 
+//build list user
 class ListUserChat extends StatelessWidget {
   const ListUserChat({Key? key}) : super(key: key);
 
@@ -107,7 +142,6 @@ class ListUserChat extends StatelessWidget {
       stream: UserProvider().listUser,
       builder: (context, snapshot) {
         return ListView.builder(
-          physics: const BouncingScrollPhysics(),
           itemCount: snapshot.data?.length,
           itemBuilder: (context, index) {
             return UserChatComponent(
@@ -120,6 +154,7 @@ class ListUserChat extends StatelessWidget {
   }
 }
 
+//User Chat Component / list user
 class UserChatComponent extends StatelessWidget {
   const UserChatComponent(
       {Key? key, required this.userModel, this.lastIndex = false})
@@ -137,12 +172,6 @@ class UserChatComponent extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.only(bottom: lastIndex ? 100 : 10),
         child: Card(
-          shape: RoundedRectangleBorder(
-            side: BorderSide(color: ColorsSetting.shadowColor, width: 3),
-            borderRadius: const BorderRadius.all(
-              Radius.circular(25),
-            ),
-          ),
           margin: EdgeInsets.zero,
           elevation: 0,
           child: Padding(
@@ -180,6 +209,54 @@ class UserChatComponent extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+//Divider status dan list user
+class DividerStatusAndUser extends StatelessWidget {
+  const DividerStatusAndUser({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(15),
+      child: Row(
+        children: <Widget>[
+          const Expanded(
+            flex: 2,
+            child: Divider(
+              thickness: 5,
+              color: Colors.white,
+            ),
+          ),
+          Expanded(
+            flex: 8,
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: ColorsSetting.secondaryColor,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(25),
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                "Start Conversation With Your Friend",
+                style: Theme.of(context).textTheme.bodyText2,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          const Expanded(
+            flex: 2,
+            child: Divider(
+              thickness: 5,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
     );
   }

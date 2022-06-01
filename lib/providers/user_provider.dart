@@ -1,3 +1,4 @@
+import 'package:belajarfirebase/models/storyuser_model.dart';
 import 'package:belajarfirebase/models/user_model.dart';
 import 'package:belajarfirebase/services/auth_service.dart';
 import 'package:belajarfirebase/services/users_service.dart';
@@ -30,6 +31,12 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void resetDataStoriesUser() {
+    listStoriesUser = [];
+
+    notifyListeners();
+  }
+
   Stream<List<UserModel>> get listUser {
     return _usersService.userCollection
         .where("uid", isNotEqualTo: _authService.getCurrentUserLoginId())
@@ -41,15 +48,44 @@ class UserProvider with ChangeNotifier {
 
   Future<void> listUserStories() async {
     listStoriesUser.clear();
-    final QuerySnapshot users = await _usersService.userCollection.get();
+    final QuerySnapshot users =
+        await _usersService.userCollection.orderBy("uid").get();
 
     users.docs.forEach((element) async {
+      dynamic dataUser = element.data();
+
       final QuerySnapshot storiesUser =
           await element.reference.collection("stories").get();
       if (storiesUser.docs.isNotEmpty) {
-        // final storiesUserNotExpired = storiesUser.docs.where((element) {
-        //   dynamic docStoriesUser = element.data();
-        // });
+        List<StoryUserModel>? dataStoriesUser = [];
+
+        storiesUser.docs.forEach((storyElement) {
+          dynamic dataStoryElement = storyElement.data();
+          DateTime postTime =
+              DateTime.parse(dataStoryElement["postTime"].toDate().toString());
+          DateTime nowTime = DateTime.now();
+
+          if (nowTime.difference(postTime).inHours <= 24) {
+            dataStoriesUser.add(StoryUserModel(
+                caption: dataStoryElement["caption"],
+                urlFile: dataStoryElement["urlFile"],
+                namaFile: dataStoryElement["namaFile"],
+                postTime: postTime,
+                views: dataStoryElement["views"]));
+          }
+        });
+
+        UserModel result = UserModel(dataUser["uid"], dataUser["username"],
+            dataUser["email"], dataUser["photoUrl"], dataStoriesUser);
+
+        if (element.id == _authService.getCurrentUserLoginId()) {
+          listStoriesUser.insert(
+            0,
+            result,
+          );
+        } else {
+          listStoriesUser.add(result);
+        }
         notifyListeners();
       }
     });

@@ -5,7 +5,7 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
 
     <application
-        android:label="One Better"
+        android:label="Talky Time"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

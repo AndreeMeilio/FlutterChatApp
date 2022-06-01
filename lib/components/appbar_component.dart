@@ -64,7 +64,7 @@ class AppBarComponent extends StatelessWidget with PreferredSizeWidget {
               : Padding(
                   padding: const EdgeInsets.only(left: 15.0),
                   child: Text(
-                    "One Better",
+                    "Talky Time",
                     style: Theme.of(context).textTheme.headline2,
                   ),
                 )),
@@ -124,7 +124,7 @@ class AppBarComponent extends StatelessWidget with PreferredSizeWidget {
 }
 
 class ProfileMenu extends StatelessWidget {
-  ProfileMenu({Key? key, required this.auth}) : super(key: key);
+  const ProfileMenu({Key? key, required this.auth}) : super(key: key);
 
   final AuthService auth;
 
@@ -152,6 +152,7 @@ class ProfileMenu extends StatelessWidget {
               onTap: () async {
                 await auth.signOutUser();
                 value.resetCurrentUserModel();
+                value.resetDataStoriesUser();
                 Navigator.pushNamedAndRemoveUntil(
                     context, "/login", (route) => false);
               },
@@ -178,8 +179,9 @@ class ProfileMenu extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: CircleAvatar(
             radius: 15,
-            backgroundImage: Image.network(user.photoUrl ??
-                    "https://sman93jkt.sch.id/wp-content/uploads/2018/01/765-default-avatar.png")
+            backgroundImage: Image.network(user.photoUrl?.isNotEmpty ?? false
+                    ? user.photoUrl!
+                    : "https://sman93jkt.sch.id/wp-content/uploads/2018/01/765-default-avatar.png")
                 .image,
           ),
         ),

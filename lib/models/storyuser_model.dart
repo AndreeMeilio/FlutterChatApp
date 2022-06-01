@@ -1,11 +1,11 @@
-class StoryUser {
+class StoryUserModel {
   String _caption;
   String _urlFile;
   String _namaFile;
   DateTime _postTime;
   List<String>? _views;
 
-  StoryUser(
+  StoryUserModel(
       {required String caption,
       required String urlFile,
       required String namaFile,
@@ -17,7 +17,7 @@ class StoryUser {
         _postTime = postTime,
         _views = views;
 
-  static Map<String, dynamic> toJson(StoryUser storyUser) {
+  static Map<String, dynamic> toJson(StoryUserModel storyUser) {
     return {
       "caption": storyUser.caption,
       "urlFile": storyUser.urlFile,

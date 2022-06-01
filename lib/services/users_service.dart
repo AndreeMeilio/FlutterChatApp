@@ -73,7 +73,7 @@ class UsersService {
           await storageStoryRef.child(namaFile).putFile(file);
       final String urlFile = await uploadStoryResult.ref.getDownloadURL();
 
-      userStoryRef.add(StoryUser.toJson(StoryUser(
+      userStoryRef.add(StoryUserModel.toJson(StoryUserModel(
           caption: caption,
           urlFile: urlFile,
           namaFile: namaFile,

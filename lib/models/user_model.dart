@@ -5,10 +5,10 @@ class UserModel {
   String? _username;
   String? _email;
   String? _photoUrl;
-  List<StoryUser>? _storyUser;
+  List<StoryUserModel>? _storyUser;
 
   UserModel(String? uid, String? username, String? email, String? photoUrl,
-      [List<StoryUser>? storyUser])
+      [List<StoryUserModel>? storyUser])
       : _uid = uid,
         _username = username,
         _email = email,
@@ -19,7 +19,7 @@ class UserModel {
   String? get username => _username;
   String? get email => _email;
   String? get photoUrl => _photoUrl;
-  List<StoryUser>? get storyUser => _storyUser;
+  List<StoryUserModel>? get storyUser => _storyUser;
 
   factory UserModel.fromJson(var json) {
     return UserModel(
