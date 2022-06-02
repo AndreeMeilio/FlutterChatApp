@@ -77,7 +77,8 @@ class StatusUser extends StatefulWidget {
   State<StatusUser> createState() => _StatusUserState();
 }
 
-class _StatusUserState extends State<StatusUser> with WidgetsBindingObserver {
+class _StatusUserState extends State<StatusUser>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // TODO: implement didChangeAppLifecycleState
@@ -96,33 +97,96 @@ class _StatusUserState extends State<StatusUser> with WidgetsBindingObserver {
         scrollDirection: Axis.horizontal,
         itemCount: value.listStoriesUser.length,
         itemBuilder: (context, index) {
-          print(
-              "di list: ${value.listStoriesUser}/ ${value.listStoriesUser.length}");
-          return Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: ColorsSetting.shadowColor,
-                    width: 3,
-                  ),
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(50),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: ColorsSetting.shadowColor,
-                      blurRadius: 3,
-                      spreadRadius: 1,
+          return GestureDetector(
+            onTap: () {
+              showDialog(
+                barrierColor: Colors.black87,
+                context: context,
+                builder: (context) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    LinearProgressIndicator(
+                      value: AnimationController(
+                              vsync: this, duration: const Duration(seconds: 5))
+                          .value,
+                      color: Theme.of(context).primaryColor,
                     ),
-                  ]),
-              margin: EdgeInsets.only(right: 15, left: (index == 0) ? 15 : 0),
-              child: CircleAvatar(
-                radius: 25,
-                backgroundImage: Image.network(value
-                            .listStoriesUser[index]?.photoUrl ??
-                        "https://sman93jkt.sch.id/wp-content/uploads/2018/01/765-default-avatar.png")
-                    .image,
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      decoration: const BoxDecoration(color: Colors.white),
+                      child: Row(
+                        children: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Icon(Icons.arrow_back_rounded)),
+                          CircleAvatar(
+                            backgroundImage: Image.network(
+                                    value.listStoriesUser[index]!.photoUrl!)
+                                .image,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Text(
+                              value.listStoriesUser[index]!.username!,
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 15),
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: Image.network(value.listStoriesUser[index]!
+                                    .storyUser![0].urlFile)
+                                .image,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(color: Colors.white),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 25),
+                      child: Text(
+                        value.listStoriesUser[index]!.storyUser![0].caption,
+                        style: Theme.of(context).textTheme.bodyText1,
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: ColorsSetting.shadowColor,
+                      width: 3,
+                    ),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(50),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ColorsSetting.shadowColor,
+                        blurRadius: 3,
+                        spreadRadius: 1,
+                      ),
+                    ]),
+                margin: EdgeInsets.only(right: 15, left: (index == 0) ? 15 : 0),
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundImage: Image.network(value
+                              .listStoriesUser[index]?.photoUrl ??
+                          "https://sman93jkt.sch.id/wp-content/uploads/2018/01/765-default-avatar.png")
+                      .image,
+                ),
               ),
             ),
           );

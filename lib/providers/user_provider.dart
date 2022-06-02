@@ -57,6 +57,7 @@ class UserProvider with ChangeNotifier {
       final QuerySnapshot storiesUser =
           await element.reference.collection("stories").get();
       if (storiesUser.docs.isNotEmpty) {
+        bool isAllStoryExpired = false;
         List<StoryUserModel>? dataStoriesUser = [];
 
         storiesUser.docs.forEach((storyElement) {
@@ -66,6 +67,8 @@ class UserProvider with ChangeNotifier {
           DateTime nowTime = DateTime.now();
 
           if (nowTime.difference(postTime).inHours <= 24) {
+            print(
+                "di foreach stories: ${nowTime.difference(postTime).inHours}");
             dataStoriesUser.add(StoryUserModel(
                 caption: dataStoryElement["caption"],
                 urlFile: dataStoryElement["urlFile"],
@@ -74,18 +77,20 @@ class UserProvider with ChangeNotifier {
                 views: dataStoryElement["views"]));
           }
         });
+        if (dataStoriesUser.isNotEmpty) {
+          UserModel result = UserModel(dataUser["uid"], dataUser["username"],
+              dataUser["email"], dataUser["photoUrl"], dataStoriesUser);
 
-        UserModel result = UserModel(dataUser["uid"], dataUser["username"],
-            dataUser["email"], dataUser["photoUrl"], dataStoriesUser);
-
-        if (element.id == _authService.getCurrentUserLoginId()) {
-          listStoriesUser.insert(
-            0,
-            result,
-          );
-        } else {
-          listStoriesUser.add(result);
+          if (element.id == _authService.getCurrentUserLoginId()) {
+            listStoriesUser.insert(
+              0,
+              result,
+            );
+          } else {
+            listStoriesUser.add(result);
+          }
         }
+
         notifyListeners();
       }
     });
