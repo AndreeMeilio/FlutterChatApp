@@ -1,4 +1,4 @@
-# belajarfirebase
+# Flutter Chat Application Using Firebase
 
 A new Flutter project.
 
