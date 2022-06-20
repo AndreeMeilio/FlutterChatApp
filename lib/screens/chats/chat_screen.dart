@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:belajarfirebase/components/appbar_component.dart';
 import 'package:belajarfirebase/components/bottommenu_component.dart';
 import 'package:belajarfirebase/models/user_model.dart';
+import 'package:belajarfirebase/providers/StoryProvider.dart';
 import 'package:belajarfirebase/providers/user_provider.dart';
 import 'package:belajarfirebase/services/auth_service.dart';
 import 'package:belajarfirebase/themes/color_theme.dart';
@@ -77,8 +80,7 @@ class StatusUser extends StatefulWidget {
   State<StatusUser> createState() => _StatusUserState();
 }
 
-class _StatusUserState extends State<StatusUser>
-    with WidgetsBindingObserver, TickerProviderStateMixin {
+class _StatusUserState extends State<StatusUser> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // TODO: implement didChangeAppLifecycleState
@@ -102,63 +104,11 @@ class _StatusUserState extends State<StatusUser>
               showDialog(
                 barrierColor: Colors.black87,
                 context: context,
-                builder: (context) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    LinearProgressIndicator(
-                      value: AnimationController(
-                              vsync: this, duration: const Duration(seconds: 5))
-                          .value,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: const BoxDecoration(color: Colors.white),
-                      child: Row(
-                        children: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Icon(Icons.arrow_back_rounded)),
-                          CircleAvatar(
-                            backgroundImage: Image.network(
-                                    value.listStoriesUser[index]!.photoUrl!)
-                                .image,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text(
-                              value.listStoriesUser[index]!.username!,
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 15),
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: Image.network(value.listStoriesUser[index]!
-                                    .storyUser![0].urlFile)
-                                .image,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      decoration: const BoxDecoration(color: Colors.white),
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 25),
-                      child: Text(
-                        value.listStoriesUser[index]!.storyUser![0].caption,
-                        style: Theme.of(context).textTheme.bodyText1,
-                      ),
-                    )
-                  ],
-                ),
+                builder: (context) {
+                  return StoryContent(
+                    user: value.listStoriesUser[index],
+                  );
+                },
               );
             },
             child: Align(
@@ -322,6 +272,99 @@ class DividerStatusAndUser extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class StoryContent extends StatefulWidget {
+  const StoryContent({Key? key, required this.user}) : super(key: key);
+
+  final UserModel? user;
+
+  @override
+  State<StoryContent> createState() => _StoryContentState();
+}
+
+class _StoryContentState extends State<StoryContent>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.detached) {
+      Provider.of<StoryProvider>(context).resetIndexStory();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<StoryProvider>(
+      builder: (context, value, child) {
+        Timer(const Duration(seconds: 5), () {
+          print("di future delayed story content: ${value.indexStory}");
+          if (value.indexStory == (widget.user!.storyUser!.length - 1)) {
+            value.resetIndexStory();
+            Navigator.pop(context);
+          } else {
+            value.incrementIndexStory();
+          }
+        });
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            LinearProgressIndicator(
+              value: AnimationController(
+                      vsync: this, duration: const Duration(seconds: 5))
+                  .value,
+              color: Theme.of(context).primaryColor,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              decoration: const BoxDecoration(color: Colors.white),
+              child: Row(
+                children: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Icon(Icons.arrow_back_rounded)),
+                  CircleAvatar(
+                    backgroundImage:
+                        Image.network(widget.user!.photoUrl!).image,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(
+                      widget.user!.username!,
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 15),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: Image.network(
+                            widget.user!.storyUser![value.indexStory].urlFile)
+                        .image,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              decoration: const BoxDecoration(color: Colors.white),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+              child: Text(
+                widget.user!.storyUser![value.indexStory].caption,
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 }

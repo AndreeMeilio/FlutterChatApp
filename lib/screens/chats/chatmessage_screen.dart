@@ -8,7 +8,6 @@ import 'package:belajarfirebase/providers/user_provider.dart';
 import 'package:belajarfirebase/services/auth_service.dart';
 import 'package:belajarfirebase/services/chat_service.dart';
 import 'package:belajarfirebase/themes/color_theme.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -118,6 +117,7 @@ class _FormSendMessageState extends State<FormSendMessage> {
   @override
   Widget build(BuildContext context) {
     final UserModel user = Provider.of<UserProvider>(context).currentUserModel;
+    print("di sendchatmessage: ${user.uid}");
     return Row(
       children: <Widget>[
         Expanded(
