@@ -6,6 +6,7 @@ class TextFieldComponent extends StatefulWidget {
   bool? isPassword = false;
   TextEditingController textEditingController;
   bool? textError = false;
+  Widget? prefixIcon;
 
   TextFieldComponent(
       {Key? key,
@@ -13,7 +14,8 @@ class TextFieldComponent extends StatefulWidget {
       this.label,
       this.textInputType,
       this.isPassword,
-      this.textError})
+      this.textError,
+      this.prefixIcon})
       : super(key: key);
 
   @override
@@ -35,6 +37,7 @@ class _TextFieldComponentState extends State<TextFieldComponent> {
             widget.label ?? "",
             style: Theme.of(context).textTheme.bodyText2,
           ),
+          prefixIcon: widget.prefixIcon,
           errorText: (widget.textError ?? false) ? "harap diisi" : null,
           errorBorder: (widget.textError ?? false)
               ? const OutlineInputBorder(

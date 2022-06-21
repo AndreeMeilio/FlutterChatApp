@@ -11,12 +11,14 @@ class UserProvider with ChangeNotifier {
 
   UserModel currentUserModel = UserModel("", "", "", "");
   List<UserModel?> listStoriesUser = [];
+  List<UserModel>? listForAddFriends;
 
   UserProvider() {
     if (_authService.getCurrentUserLoginId().isNotEmpty) {
       initCurrentUserModel();
     }
     listUserStories();
+    listUserForAddFriend();
   }
 
   void initCurrentUserModel() async {
@@ -37,13 +39,53 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Stream<List<UserModel>> get listUser {
-    return _usersService.userCollection
-        .where("uid", isNotEqualTo: _authService.getCurrentUserLoginId())
-        .snapshots()
-        .map(
-          (value) => _usersService.userModelFromSnapshot(value),
-        );
+  Future<void> onRefreshIndicator() async {
+    await listUserStories();
+    await listFriendsUser(_authService.getCurrentUserLoginId());
+  }
+
+  Future<void> listUserForAddFriend({String? email}) async {
+    int jumlahDataPerRequest = 10;
+
+    if (email?.isNotEmpty ?? false) {
+      QuerySnapshot collectionUser = await _usersService.userCollection
+          .limit(jumlahDataPerRequest)
+          .where("email", isEqualTo: email.toString())
+          .where("uid", isNotEqualTo: _authService.getCurrentUserLoginId())
+          .get();
+      listForAddFriends = collectionUser.docs
+          .map((user) => UserModel.fromJson(user.data()))
+          .toList();
+
+      notifyListeners();
+    } else {
+      QuerySnapshot collectionUser = await _usersService.userCollection
+          .limit(jumlahDataPerRequest)
+          .where("uid", isNotEqualTo: _authService.getCurrentUserLoginId())
+          .get();
+      listForAddFriends = collectionUser.docs
+          .map((user) => UserModel.fromJson(user.data()))
+          .toList();
+
+      notifyListeners();
+    }
+  }
+
+  Future<List<UserModel>> listFriendsUser(String id) async {
+    DocumentSnapshot dataDocUser =
+        await _usersService.userCollection.doc(id).get();
+    dynamic dataUser = dataDocUser.data();
+    List<dynamic> listFriendsId = dataUser["friends"];
+
+    List<UserModel> friendsResult = [];
+    await Future.forEach(listFriendsId, (element) async {
+      print(element);
+      DocumentSnapshot docUserFriend =
+          await _usersService.userCollection.doc(element.toString()).get();
+      friendsResult.add(UserModel.fromJson(docUserFriend.data()));
+    });
+
+    return friendsResult;
   }
 
   Future<void> listUserStories() async {

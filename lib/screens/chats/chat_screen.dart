@@ -23,28 +23,20 @@ class ChatScreen extends StatelessWidget {
       body: RefreshIndicator(
         backgroundColor: ColorsSetting.shadowColor,
         color: ColorsSetting.secondaryColor,
-        onRefresh: Provider.of<UserProvider>(context).listUserStories,
+        onRefresh: Provider.of<UserProvider>(context).onRefreshIndicator,
         child: Column(
           children: <Widget>[
             Expanded(
               flex: 3,
-              child: Container(
-                padding: const EdgeInsets.only(top: 20),
-                decoration: BoxDecoration(
+              child: ClipPath(
+                clipper: CustomClipStory(),
+                child: Container(
+                  padding: const EdgeInsets.only(top: 20),
+                  decoration: BoxDecoration(
                     color: ColorsSetting.secondaryColor,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.elliptical(250, 40),
-                      bottomRight: Radius.elliptical(250, 40),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ColorsSetting.shadowColor,
-                        blurRadius: 15,
-                        spreadRadius: 5,
-                        offset: const Offset(0, 1),
-                      ),
-                    ]),
-                child: const StatusUser(),
+                  ),
+                  child: const StatusUser(),
+                ),
               ),
             ),
             const Expanded(
@@ -57,7 +49,7 @@ class ChatScreen extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: const ListUserChat(),
+                    child: ListUserChat(),
                   ),
                   BottomMenu(
                     menuActive: "chat",
@@ -148,21 +140,35 @@ class _StatusUserState extends State<StatusUser> with WidgetsBindingObserver {
 
 //build list user
 class ListUserChat extends StatelessWidget {
-  const ListUserChat({Key? key}) : super(key: key);
+  ListUserChat({Key? key}) : super(key: key);
+
+  String idCurrentLoginUser = AuthService().getCurrentUserLoginId();
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<UserModel>>(
-      stream: UserProvider().listUser,
+    Future<List<UserModel>> listFriendsProvider =
+        Provider.of<UserProvider>(context).listFriendsUser(idCurrentLoginUser);
+
+    return FutureBuilder<List<UserModel>>(
+      future: listFriendsProvider,
       builder: (context, snapshot) {
-        return ListView.builder(
-          itemCount: snapshot.data?.length,
-          itemBuilder: (context, index) {
-            return UserChatComponent(
-                userModel: snapshot.data?[index],
-                lastIndex: (snapshot.data?.length ?? 0) - 1 == index);
-          },
-        );
+        if (snapshot.connectionState == ConnectionState.done) {
+          print("di streambuilder: ${snapshot.data}");
+          return snapshot.data != null
+              ? ListView.builder(
+                  itemCount: snapshot.data?.length,
+                  itemBuilder: (context, index) {
+                    return UserChatComponent(
+                        userModel: snapshot.data?[index],
+                        lastIndex: (snapshot.data?.length ?? 0) - 1 == index);
+                  },
+                )
+              : Text("silahkan tambah teman baru");
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
       },
     );
   }
@@ -367,4 +373,25 @@ class _StoryContentState extends State<StoryContent>
       },
     );
   }
+}
+
+class CustomClipStory extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    double width = size.width;
+    double height = size.height;
+
+    Offset titikAwal = Offset(width / 2, height);
+    Offset titikAkhir = Offset(width, height - 35);
+
+    return Path()
+      ..lineTo(0, height - 35)
+      ..quadraticBezierTo(
+          titikAwal.dx, titikAwal.dy, titikAkhir.dx, titikAkhir.dy)
+      ..lineTo(width, 0)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

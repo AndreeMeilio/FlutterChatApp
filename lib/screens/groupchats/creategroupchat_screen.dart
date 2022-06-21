@@ -20,7 +20,8 @@ class CreateGroupChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBarComponent(auth: _auth, label: "Group Chat"),
+      appBar:
+          AppBarComponent(auth: _auth, label: "Group Chat", showAction: false),
       backgroundColor: Theme.of(context).primaryColor,
       body: Container(
         padding: const EdgeInsets.all(15),
@@ -99,7 +100,7 @@ class _FormCreateNewGroupState extends State<FormCreateNewGroup> {
         const SizedBox(
           height: 5,
         ),
-        const Expanded(
+        Expanded(
           flex: 4,
           child: ListUser(),
         ),
@@ -133,13 +134,20 @@ class _FormCreateNewGroupState extends State<FormCreateNewGroup> {
 }
 
 class ListUser extends StatelessWidget {
-  const ListUser({Key? key}) : super(key: key);
+  ListUser({Key? key}) : super(key: key);
+
+  String idCurrentLoginUser = AuthService().getCurrentUserLoginId();
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<UserModel>>(
-      stream: UserProvider().listUser,
-      builder: ((context, snapshot) => ListView.builder(
+    Future<List<UserModel>> listFriendsProvider =
+        Provider.of<UserProvider>(context).listFriendsUser(idCurrentLoginUser);
+
+    return FutureBuilder<List<UserModel>>(
+      future: listFriendsProvider,
+      builder: ((context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return ListView.builder(
             itemCount: snapshot.data?.length,
             itemBuilder: (context, index) => Container(
               margin: const EdgeInsets.symmetric(vertical: 10),
@@ -194,7 +202,13 @@ class ListUser extends StatelessWidget {
                 ],
               ),
             ),
-          )),
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      }),
     );
   }
 }

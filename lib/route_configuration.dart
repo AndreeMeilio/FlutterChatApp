@@ -4,13 +4,17 @@ import 'package:belajarfirebase/screens/authentication/login_screen.dart';
 import 'package:belajarfirebase/screens/authentication/register_screen.dart';
 import 'package:belajarfirebase/screens/chats/chat_screen.dart';
 import 'package:belajarfirebase/screens/chats/chatmessage_screen.dart';
+import 'package:belajarfirebase/screens/groupchats/creategroupchat_screen.dart';
 import 'package:belajarfirebase/screens/groupchats/groupchat_screen.dart';
 import 'package:belajarfirebase/screens/groupchats/groupchatmessage_screen.dart';
 import 'package:belajarfirebase/screens/splash_screen.dart';
+import 'package:belajarfirebase/screens/users/addfriend_screen.dart';
 import 'package:belajarfirebase/screens/users/addstory_screen.dart';
 import 'package:belajarfirebase/screens/users/profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+enum SlideTransitionFromTo { RightToLeft, BottomToTop }
 
 class RouteConfiguration {
   //function untuk fade transition pada page builder
@@ -24,9 +28,18 @@ class RouteConfiguration {
   }
 
   //function untuk slide dari samping transition pada page builder
-  SlideTransition _transitionSlideScreen(Animation animation, Widget? child) {
-    Offset titikAwal = const Offset(1.0, 0.0); //dari kanan layar
-    Offset titikAkhir = const Offset(0.0, 0.0); //ke kiri layar
+  SlideTransition _transitionSlideScreen(Animation animation, Widget? child,
+      {SlideTransitionFromTo slideTransitionFromTo =
+          SlideTransitionFromTo.RightToLeft}) {
+    Offset titikAwal;
+    Offset titikAkhir;
+    if (slideTransitionFromTo == SlideTransitionFromTo.RightToLeft) {
+      titikAwal = const Offset(1.0, 0.0); //dari kanan layar
+      titikAkhir = const Offset(0.0, 0.0); //ke kiri layar
+    } else {
+      titikAwal = const Offset(0.0, 1.0); //dari kanan layar
+      titikAkhir = const Offset(0.0, 0.0); //ke kiri layar
+    }
 
     Tween<Offset> offsetTween =
         Tween<Offset>(begin: titikAwal, end: titikAkhir);
@@ -63,6 +76,12 @@ class RouteConfiguration {
             reverseTransitionDuration: const Duration(milliseconds: 250),
             pageBuilder: (context, animation, secondaryAnimation) =>
                 _transitionFadeScreen(animation, ChatScreen()));
+      case "/addfriends":
+        return PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              _transitionSlideScreen(animation, AddFriendScreen(),
+                  slideTransitionFromTo: SlideTransitionFromTo.BottomToTop),
+        );
       case "/chat":
         return PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 250),
@@ -76,6 +95,12 @@ class RouteConfiguration {
           reverseTransitionDuration: const Duration(milliseconds: 250),
           pageBuilder: (context, animation, secondaryAnimation) =>
               _transitionFadeScreen(animation, GroupChatScreen()),
+        );
+      case "/createGroupChat":
+        return PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              _transitionSlideScreen(animation, CreateGroupChatScreen(),
+                  slideTransitionFromTo: SlideTransitionFromTo.BottomToTop),
         );
       case "/groupchatmessage":
         return PageRouteBuilder(
