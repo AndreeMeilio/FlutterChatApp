@@ -22,7 +22,6 @@ class AddStoryProvider extends ChangeNotifier {
       }
     } catch (e) {
       fileStory = null;
-      print("error di pickFile Story: $e");
     }
     notifyListeners();
   }

@@ -153,8 +153,7 @@ class ListUserChat extends StatelessWidget {
       future: listFriendsProvider,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          print("di streambuilder: ${snapshot.data}");
-          return snapshot.data != null
+          return snapshot.data?.isNotEmpty ?? false
               ? ListView.builder(
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
@@ -163,7 +162,17 @@ class ListUserChat extends StatelessWidget {
                         lastIndex: (snapshot.data?.length ?? 0) - 1 == index);
                   },
                 )
-              : Text("silahkan tambah teman baru");
+              : ListView(
+                  children: [
+                    Card(
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        alignment: Alignment.center,
+                        child: const Text("silahkan tambah teman baru"),
+                      ),
+                    )
+                  ],
+                );
         } else {
           return const Center(
             child: CircularProgressIndicator(),
@@ -307,7 +316,6 @@ class _StoryContentState extends State<StoryContent>
     return Consumer<StoryProvider>(
       builder: (context, value, child) {
         Timer(const Duration(seconds: 5), () {
-          print("di future delayed story content: ${value.indexStory}");
           if (value.indexStory == (widget.user!.storyUser!.length - 1)) {
             value.resetIndexStory();
             Navigator.pop(context);

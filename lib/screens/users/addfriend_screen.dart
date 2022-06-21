@@ -1,7 +1,9 @@
 import 'package:belajarfirebase/components/appbar_component.dart';
+import 'package:belajarfirebase/components/scaffoldmessage_component.dart';
 import 'package:belajarfirebase/models/user_model.dart';
 import 'package:belajarfirebase/providers/user_provider.dart';
 import 'package:belajarfirebase/services/auth_service.dart';
+import 'package:belajarfirebase/services/friends_service.dart';
 import 'package:belajarfirebase/themes/color_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -95,7 +97,7 @@ class _FormCreateNewGroupState extends State<FormCreateNewGroup> {
           height: 25,
         ),
         Text(
-          "This's maybe what you looking for",
+          "This's maybe who you looking for",
           style: Theme.of(context).textTheme.bodyText1,
         ),
         const SizedBox(
@@ -114,55 +116,80 @@ class ListFindFriend extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (BuildContext context, value, Widget? child) {
-        print("di listfindfriend: ${value.listForAddFriends}");
         return value.listForAddFriends != null
             ? ListView.builder(
                 itemCount: value.listForAddFriends?.length,
-                itemBuilder: (context, index) => Container(
-                  margin: const EdgeInsets.all(10),
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: CircleAvatar(
-                          backgroundImage: Image.network(value
-                                      .listForAddFriends?[index].photoUrl ??
-                                  "https://sman93jkt.sch.id/wp-content/uploads/2018/01/765-default-avatar.png")
-                              .image,
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              value.listForAddFriends?[index].username ?? "",
-                              style: Theme.of(context).textTheme.bodyText2,
-                            ),
-                            Text(
-                              value.listForAddFriends?[index].email ?? "",
-                              style: Theme.of(context).textTheme.bodyText2,
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.send_sharp,
-                          size: 25,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
+                itemBuilder: (context, index) => ItemFriends(
+                      user: value.listForAddFriends?[index],
+                    ))
             : Text(
                 "We can find your friend",
                 style: Theme.of(context).textTheme.bodyText2,
               );
       },
+    );
+  }
+}
+
+class ItemFriends extends StatelessWidget {
+  const ItemFriends({Key? key, required UserModel? user})
+      : _user = user,
+        super(key: key);
+
+  final UserModel? _user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      child: Row(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: CircleAvatar(
+              backgroundImage: Image.network(_user?.photoUrl ??
+                      "https://sman93jkt.sch.id/wp-content/uploads/2018/01/765-default-avatar.png")
+                  .image,
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  _user?.username ?? "",
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+                Text(
+                  _user?.email ?? "",
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            iconSize: 25,
+            onPressed: () async {
+              UserModel userSender = await AuthService().getCurrentUserModel();
+
+              bool sendFriendsRequest = await FriendsService()
+                  .sendFriendRequest(userSender, _user?.uid ?? "");
+              if (sendFriendsRequest) {
+                ScaffoldMessageComponent.showScaffoldComponentMessage(
+                    context, "Friend Request Has Send Successfully");
+              } else {
+                ScaffoldMessageComponent.showScaffoldComponentMessage(
+                    context, "Error in system, please try again later");
+              }
+            },
+            icon: Icon(
+              Icons.send_sharp,
+              size: 25,
+              color: Theme.of(context).primaryColor,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

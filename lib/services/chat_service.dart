@@ -35,7 +35,6 @@ class ChatService {
   }
 
   List<ChatModel> listChatUserFromJson(QuerySnapshot snapshot) {
-    print("di list chat user from json: ${snapshot.docs[0]["username"]}");
     return snapshot.docs
         .map(
           (value) => ChatModel(

@@ -42,7 +42,6 @@ class AuthService {
 
       return userFromCredential(userCredential.user);
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }
@@ -60,7 +59,6 @@ class AuthService {
 
         return userFromCredential(userCredential.user);
       } catch (e) {
-        print("di sign up error : ${e.toString()}");
         return null;
       }
     } else {
@@ -80,7 +78,6 @@ class AuthService {
 
       return userFromCredential(user);
     } catch (e) {
-      print("di sign in email password error : ${e.toString()}");
       return null;
     }
   }
@@ -105,7 +102,6 @@ class AuthService {
         return null;
       }
     } on PlatformException catch (e) {
-      print("di sign in google error: ${e.code}");
       return null;
     }
   }
@@ -125,11 +121,9 @@ class AuthService {
 
         return userCredential;
       } else {
-        print("login gagal");
         return null;
       }
     } catch (e) {
-      print("di sign in facebook error: $e");
       return null;
     }
   }
@@ -140,29 +134,6 @@ class AuthService {
       await _auth.signOut();
       await _googleSignIn.signOut();
       await _facebookAuth.logOut();
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
-
-  // //Set preference user
-  // Future<void> setPreferenceUser(UserModel user) async {
-  //   final sharedPreference = await SharedPreferences.getInstance();
-  //   sharedPreference.setString("uid", user.uid ?? "");
-  //   sharedPreference.setString("username", user.username ?? "");
-  //   sharedPreference.setString("email", user.email ?? "");
-  //   sharedPreference.setString("photoUrl", user.photoUrl ?? "");
-  // }
-  //
-  // //get user preference / user data login
-  // Future<UserModel> getPreferenceUser() async {
-  //   final sharedPreference = await SharedPreferences.getInstance();
-  //
-  //   return UserModel(
-  //     sharedPreference.getString("uid"),
-  //     sharedPreference.getString("username"),
-  //     sharedPreference.getString("email"),
-  //     sharedPreference.getString("photoUrl"),
-  //   );
-  // }
 }

@@ -23,7 +23,6 @@ class GroupChatService {
 
       return dataCreatedGroup;
     } catch (e) {
-      print("error di create new group: $e");
       return null;
     }
   }

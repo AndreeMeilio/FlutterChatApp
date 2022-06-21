@@ -48,7 +48,6 @@ class ListGroupChat extends StatelessWidget {
         user.uid ?? "",
       ),
       builder: (context, snapshot) {
-        print(snapshot);
         if (snapshot.hasData) {
           return ListView.builder(
             itemCount: snapshot.data?.length,

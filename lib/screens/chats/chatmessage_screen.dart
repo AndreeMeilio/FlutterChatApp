@@ -117,7 +117,6 @@ class _FormSendMessageState extends State<FormSendMessage> {
   @override
   Widget build(BuildContext context) {
     final UserModel user = Provider.of<UserProvider>(context).currentUserModel;
-    print("di sendchatmessage: ${user.uid}");
     return Row(
       children: <Widget>[
         Expanded(

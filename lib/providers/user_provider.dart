@@ -78,12 +78,13 @@ class UserProvider with ChangeNotifier {
     List<dynamic> listFriendsId = dataUser["friends"];
 
     List<UserModel> friendsResult = [];
-    await Future.forEach(listFriendsId, (element) async {
-      print(element);
-      DocumentSnapshot docUserFriend =
-          await _usersService.userCollection.doc(element.toString()).get();
-      friendsResult.add(UserModel.fromJson(docUserFriend.data()));
-    });
+    if (listFriendsId.isNotEmpty) {
+      await Future.forEach(listFriendsId, (element) async {
+        DocumentSnapshot docUserFriend =
+            await _usersService.userCollection.doc(element.toString()).get();
+        friendsResult.add(UserModel.fromJson(docUserFriend.data()));
+      });
+    }
 
     return friendsResult;
   }
@@ -109,8 +110,6 @@ class UserProvider with ChangeNotifier {
           DateTime nowTime = DateTime.now();
 
           if (nowTime.difference(postTime).inHours <= 24) {
-            print(
-                "di foreach stories: ${nowTime.difference(postTime).inHours}");
             dataStoriesUser.add(StoryUserModel(
                 caption: dataStoryElement["caption"],
                 urlFile: dataStoryElement["urlFile"],

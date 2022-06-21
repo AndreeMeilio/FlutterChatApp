@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 
 class UsersService {
   final CollectionReference _userCollection =
@@ -21,8 +20,8 @@ class UsersService {
         await _userCollection.where("uid", isEqualTo: user?.uid).get();
     if (checkedUser.docs.isEmpty) {
       final dataUser = _userCollection.doc(user?.uid).set(UserModel.toJson(
-          UserModel(
-              user?.uid, user?.displayName, user?.email, user?.photoURL)));
+          UserModel(user?.uid, user?.displayName, user?.email, user?.photoURL,
+              null, [])));
     }
   }
 
@@ -53,10 +52,7 @@ class UsersService {
       await userCollection
           .doc(user?.uid)
           .update({"photoUrl": downloadUrlPhoto});
-    } catch (e, s) {
-      debugPrint(
-          "di error updateProfileUser: exception - $e / stacktrace - $s");
-    }
+    } catch (e, s) {}
   }
 
   Future<void> uploadStoryUser(
@@ -78,8 +74,6 @@ class UsersService {
           urlFile: urlFile,
           namaFile: namaFile,
           postTime: postTime)));
-    } catch (e) {
-      print("error di upload story user $e");
-    }
+    } catch (e) {}
   }
 }

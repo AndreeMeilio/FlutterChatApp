@@ -125,6 +125,7 @@ class _FormLoginState extends State<FormLogin> {
 
                 if (userCredential != null) {
                   value.initCurrentUserModel();
+                  value.listUserForAddFriend();
                   Navigator.pushNamedAndRemoveUntil(
                       context, "/home", (_) => false);
                 } else {
@@ -186,6 +187,7 @@ class LoginAnonymouslyButton extends StatelessWidget {
 
             if (userCredential != null) {
               value.initCurrentUserModel();
+              value.listUserForAddFriend();
               Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
             } else {
               Navigator.pop(context);
@@ -222,6 +224,7 @@ class LoginWithGoggleButton extends StatelessWidget {
             UserModel? userCredential = await _auth.signInUsingGoogle();
             if (userCredential != null) {
               value.initCurrentUserModel();
+              value.listUserForAddFriend();
               Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
             } else {
               Navigator.pop(context);
@@ -259,6 +262,7 @@ class LoginWithFacebookButton extends StatelessWidget {
 
             if (userCredential != null) {
               value.initCurrentUserModel();
+              value.listUserForAddFriend();
               Navigator.pushNamedAndRemoveUntil(context, "/home", (_) => false);
             } else {
               Navigator.pop(context);
